@@ -1,0 +1,11 @@
+{
+  "n_prescribers": 14997,
+  "n_flagged": 300,
+  "flagged_pct": 0.02,
+  "total_drug_cost": 860094996.9200001,
+  "flagged_drug_cost": 56088683.43,
+  "flagged_cost_share": 0.0652,
+  "ground_truth_anomalies": 225,
+  "precision_at_k": 0.6267,
+  "recall_in_flagged": 0.7022
+}
