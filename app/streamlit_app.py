@@ -34,7 +34,9 @@ st.markdown("""
   .hero .by {color:#c8b6ec; font-size:0.9rem; margin-top:10px;}
   div[data-testid="stMetric"] {background:#f7f5fc; border:1px solid #e6e0f2;
       border-radius:12px; padding:14px 16px;}
-  div[data-testid="stMetricValue"] {color:#3d2b8c; font-weight:700;}
+  div[data-testid="stMetricValue"] {color:#3d2b8c !important; font-weight:700;}
+  div[data-testid="stMetricLabel"], div[data-testid="stMetricLabel"] p {
+      color:#334155 !important; font-weight:600;}
   .stTabs [data-baseweb="tab"] {font-weight:600;}
 </style>
 """, unsafe_allow_html=True)
