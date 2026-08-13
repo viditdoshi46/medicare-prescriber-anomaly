@@ -27,20 +27,33 @@ st.set_page_config(page_title="Rx Anomaly Detection | Vidit Doshi",
 st.markdown("""
 <style>
   .block-container {padding-top: 2rem; max-width: 1250px;}
-  .hero {background: linear-gradient(120deg, #14315e 0%, #2a7f8f 100%);
+  .hero {background: linear-gradient(120deg, #3d2b8c 0%, #7b3fb0 100%);
          color:#fff; padding:26px 30px; border-radius:14px; margin-bottom:8px;}
   .hero h1 {color:#fff; margin:0; font-size:1.85rem; font-weight:700;}
-  .hero p {color:#d9ecf2; margin:6px 0 0 0; font-size:1.02rem;}
-  .hero .by {color:#a7d3de; font-size:0.9rem; margin-top:10px;}
-  div[data-testid="stMetric"] {background:#f4f8fb; border:1px solid #e2ebf2;
+  .hero p {color:#e7defb; margin:6px 0 0 0; font-size:1.02rem;}
+  .hero .by {color:#c8b6ec; font-size:0.9rem; margin-top:10px;}
+  div[data-testid="stMetric"] {background:#f7f5fc; border:1px solid #e6e0f2;
       border-radius:12px; padding:14px 16px;}
-  div[data-testid="stMetricValue"] {color:#14315e; font-weight:700;}
+  div[data-testid="stMetricValue"] {color:#3d2b8c; font-weight:700;}
   .stTabs [data-baseweb="tab"] {font-weight:600;}
 </style>
 """, unsafe_allow_html=True)
 
-HOVER = dict(bgcolor="white", bordercolor="#cfdbe6",
-             font=dict(color="#14315e", size=13))
+HOVER = dict(bgcolor="white", bordercolor="#ded3f2",
+             font=dict(color="#3d2b8c", size=13))
+
+# Plain-English labels for the peer-metric z-scores (Investigate tab)
+METRIC_LABELS = {
+    "cost_per_claim": "Cost per claim",
+    "cost_per_bene": "Cost per beneficiary",
+    "claims_per_bene": "Claims per beneficiary",
+    "avg_day_supply": "Avg days supply",
+    "brand_cost_share": "Brand-name cost share",
+    "opioid_claim_rate": "Opioid claim rate",
+    "log_total_cost": "Total drug cost (log)",
+}
+
+ACCENT = "#d98324"   # amber accent, distinct from Project 1's red
 
 
 @st.cache_resource(show_spinner="First load: building the dataset & scores (~30s)…")
@@ -129,7 +142,7 @@ with tab1:
         d = flagged["top_driver"].value_counts().sort_values()
         fig = px.bar(x=d.values, y=d.index, orientation="h",
                      labels={"x": "Flagged prescribers", "y": ""},
-                     title="Why prescribers were flagged", color_discrete_sequence=["#c0392b"])
+                     title="Why prescribers were flagged", color_discrete_sequence=[ACCENT])
         fig.update_traces(hovertemplate="<b>%{y}</b><br>%{x} flagged<extra></extra>")
         fig.update_layout(height=380, margin=dict(l=10, r=10, t=40, b=10),
                           hoverlabel=HOVER)
@@ -139,7 +152,7 @@ with tab1:
         fig = px.bar(x=s.values, y=s.index, orientation="h",
                      labels={"x": "% flagged", "y": ""},
                      title="Flag rate by specialty",
-                     color=s.values, color_continuous_scale="Teal")
+                     color=s.values, color_continuous_scale="Purples")
         fig.update_traces(hovertemplate="<b>%{y}</b><br>%{x:.1f}% flagged<extra></extra>")
         fig.update_layout(height=380, margin=dict(l=10, r=10, t=40, b=10),
                           coloraxis_showscale=False, hoverlabel=HOVER)
@@ -150,10 +163,10 @@ with tab1:
           .agg(flagged=("is_flagged", "sum"),
                flagged_cost=("Tot_Drug_Cst", "sum")).reset_index()
           .sort_values("flagged_cost", ascending=False))
-    by["flagged_cost"] = by["flagged_cost"].round(0)
+    by["flagged_cost"] = by["flagged_cost"].apply(lambda v: f"${v:,.0f}")
     st.dataframe(by.rename(columns={"Prscrbr_Type": "Specialty",
                                     "flagged": "Flagged",
-                                    "flagged_cost": "Flagged drug cost ($)"}),
+                                    "flagged_cost": "Flagged drug cost"}),
                  hide_index=True, use_container_width=True)
 
 # ---------------- Flagged list ----------------
@@ -179,8 +192,8 @@ with tab2:
                  "Prscrbr_State_Abrvtn", "Prscrbr_Type", "Tot_Clms",
                  "Tot_Drug_Cst", "cost_per_claim", "top_driver",
                  "anomaly_score"]].copy()
-    show["Tot_Drug_Cst"] = show["Tot_Drug_Cst"].round(0)
-    show["cost_per_claim"] = show["cost_per_claim"].round(0)
+    show["Tot_Drug_Cst"] = show["Tot_Drug_Cst"].apply(lambda v: f"${v:,.0f}")
+    show["cost_per_claim"] = show["cost_per_claim"].apply(lambda v: f"${v:,.0f}")
     show["anomaly_score"] = show["anomaly_score"].round(3)
     st.caption(f"{len(show):,} flagged prescribers match the filters")
     st.dataframe(show.rename(columns={
@@ -204,14 +217,15 @@ with tab3:
 
     zcols = [c for c in df.columns if c.startswith("z_")]
     zvals = {c.replace("z_", ""): float(row[c]) for c in zcols}
-    zdf = (pd.DataFrame({"metric": list(zvals), "peer_z": list(zvals.values())})
+    zdf = (pd.DataFrame({"metric": [METRIC_LABELS.get(k, k) for k in zvals],
+                         "peer_z": list(zvals.values())})
            .sort_values("peer_z"))
     fig = px.bar(zdf, x="peer_z", y="metric", orientation="h",
                  labels={"peer_z": "Peer z-score (SDs from specialty median)", "metric": ""},
-                 color="peer_z", color_continuous_scale="RdBu_r",
+                 color="peer_z", color_continuous_scale="PuOr_r",
                  range_color=[-6, 6])
-    fig.add_vline(x=3, line_dash="dash", line_color="#c0392b")
-    fig.add_vline(x=-3, line_dash="dash", line_color="#c0392b")
+    fig.add_vline(x=3, line_dash="dash", line_color=ACCENT)
+    fig.add_vline(x=-3, line_dash="dash", line_color=ACCENT)
     fig.update_traces(hovertemplate="<b>%{y}</b><br>z = %{x:.2f}<extra></extra>")
     fig.update_layout(height=430, margin=dict(l=10, r=10, t=20, b=10),
                       coloraxis_showscale=False, hoverlabel=HOVER)
