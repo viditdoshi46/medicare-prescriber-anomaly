@@ -1,0 +1,7 @@
+# Pinned dark "audit console" theme so the app looks identical for every visitor.
+[theme]
+base = "dark"
+primaryColor = "#f5a524"
+backgroundColor = "#0e0c1e"
+secondaryBackgroundColor = "#1a1738"
+textColor = "#ece8ff"

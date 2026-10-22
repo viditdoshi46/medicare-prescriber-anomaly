@@ -1,3 +1,15 @@
+<p align="center"><img src="assets/banner.svg" alt="Medicare Prescriber Anomaly" width="100%"></p>
+
+<p align="center">
+  <a href="https://medicare-prescriber-anomaly-viditdoshi46.streamlit.app"><img src="https://img.shields.io/badge/Live%20app-open-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Live app"></a>
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/SQL-analysis-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="SQL">
+</p>
+
+<p align="center"><b><a href="https://medicare-prescriber-anomaly-viditdoshi46.streamlit.app">Live app</a></b> &nbsp;·&nbsp; <a href="#">Back to top</a></p>
+
+---
+
 # Medicare Part D Prescriber Anomaly Detection
 
 **Business question:** Medicare Part D pays out tens of billions in drug spend across roughly a million prescribers, and program-integrity teams can only review a tiny fraction. **Which prescribers should they investigate first — and why?**
