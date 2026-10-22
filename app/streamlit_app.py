@@ -194,7 +194,7 @@ else:
     kpi(c4, "Total drug cost", f"${df['Tot_Drug_Cst'].sum()/1e6:,.0f}M", "across all prescribers", "#f472b6", 240)
 
 st.write("")
-tab1, tab2, tab3 = st.tabs(["📊  Overview", "🚩  Flagged prescribers", "🔎  Investigate"])
+tab1, tab2, tab3 = st.tabs(["Overview", "Flagged prescribers", "Investigate"])
 
 # ---------------- Overview ----------------
 with tab1:
